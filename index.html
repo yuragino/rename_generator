@@ -99,13 +99,12 @@
     };
 
     /*--------------------------------------
-  ファイル名に載せる通し番号の作成
+  持ってきた数字を3桁に0埋めする関数
 --------------------------------------*/
-    // (0埋めしたい数字,出力したい文字列の長さ)
-    function pad(num, size) {
-      //toStringでnumを文字列に変換
+    // 0埋めしたい数字が引数
+    function pad(num) {
       // padStart (目標となる文字列の長さ,先頭に埋める文字)
-      return num.toString().padStart(size, '0')
+      return num.toString().padStart(3, '0')
     }
 
     /*--------------------------------------
@@ -115,7 +114,7 @@
       // category = idがcategoryの場所でユーザーが選んだ値
       const category = document.getElementById("category").value;
       // idがcounterDisplayの場所(現在値)に表示する番号を0埋めでつくる
-      document.getElementById("counterDisplay").textContent = pad(counters[category], 3);
+      document.getElementById("counterDisplay").textContent = pad(counters[category]);
     }
 
     /*--------------------------------------
@@ -151,7 +150,7 @@
 
         // 通し番号が手動で入力されている場合、値を数字に変換し、3桁の0埋め
         //入力されてない場合、カウンターを使用しnumberに代入
-        let number = numberInput ? pad(Number(numberInput), 3) : pad(counters[category], 3);
+        let number = numberInput ? pad(Number(numberInput)) : pad(counters[category]);
 
         preview += ` ${category}${number}${suffix}_身丈${身丈}_裄${裄}_後幅${後幅}`;
       }
@@ -189,14 +188,14 @@
         // 入力欄の値を数字に変換
         const inputNumber = Number(numberInput.value);
         // 3桁になるように0埋め
-        number = pad(inputNumber, 3);
+        number = pad(inputNumber);
         // カウンターを更新
         counters[category] = inputNumber + 1;
         // カウンターをlocalStorageに保存
         saveCounter(category);
       } else {
         // 現在のカウンターの数をそのまま使用し、0埋め
-        number = pad(counters[category], 3);
+        number = pad(counters[category]);
         // カウンターを更新
         counters[category]++;
         // カウンンターを保存
@@ -291,6 +290,7 @@
     /*--------------------------------------
   書く入力欄のクリア
 --------------------------------------*/
+    // 身丈+裄+後幅のクリア
     function clearInputCode() {
       document.getElementById("inputCode").value = '';
       updatePreview();
@@ -298,16 +298,18 @@
       document.getElementById("inputCode").focus();
     }
 
-    function clearSuffixInput() {
-      document.getElementById("suffixInput").value = '';
-      updatePreview();
-      document.getElementById("suffixInput").focus();
-    }
-
+    // 手入力通し番号のクリア
     function clearNumberInput() {
       document.getElementById("numberInput").value = '';
       updatePreview();
       document.getElementById("numberInput").focus();
+    }
+
+    // 任意の文字のクリア
+    function clearSuffixInput() {
+      document.getElementById("suffixInput").value = '';
+      updatePreview();
+      document.getElementById("suffixInput").focus();
     }
 
     /*--------------------------------------
@@ -319,8 +321,7 @@
     updatePreview();
 
   </script>
-  
+
 </body>
 
 </html>
-
