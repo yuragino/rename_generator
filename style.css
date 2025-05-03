@@ -1,0 +1,61 @@
+body {
+  font-family: sans-serif;
+  background-color: #f9f9f9;
+  padding: 20px;
+  max-width: 400px;
+  margin: auto;
+}
+
+.container {
+  background-color: #fff;
+  padding: 20px 25px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+/* 「ファイル名作成ツール」 */
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+/* 入力欄の見出し */
+label {
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+/* 入力欄 */
+input, select {
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+}
+
+/* 「ファイル名を生成」ボタン */
+.generate {
+  margin-top: 15px;
+  padding: 10px 0;
+  width: 100%;
+  border: none;
+  background-color: #4285f4;
+  color: white;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.generate
+:hover {
+  background-color: #3367d6;
+}
+
+#result {
+  margin-top: 20px;
+  font-size: 16px;
+  color: green;
+  text-align: center;
+}
