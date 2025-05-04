@@ -50,7 +50,9 @@
   <div id="preview">生成予定ファイル名：</div>
 
   <!-- 複数画像をアップロード -->
-  <label>画像をアップロード</label>
+  <label>画像アップロード</label>
+  <button type="button" onclick="prevImage()">戻る</button>
+  <button type="button" onclick="nextImage()">進む</button>
   <!-- 画像ファイルのみ、複数選択可能 -->
   <input type="file" id="imageUpload" multiple accept="image/*" onchange="onImageUpload(event)" />
 
@@ -138,7 +140,7 @@
     }
 
     /*--------------------------------------
-    生成予定ファイル名の処理
+    生成予定ファイル名を表示する
 --------------------------------------*/
     function namePreview() {
 
@@ -150,6 +152,79 @@
 
       // 「生成予定ファイル名：」にファイル名のプレビューを表示
       document.getElementById("preview").textContent = preview;
+    }
+
+    /*--------------------------------------
+      画像がアップロードされた時の処理
+--------------------------------------*/
+
+    function onImageUpload(event) {
+
+      // 全画像を配列化する
+      uploadedFiles = Array.from(event.target.files);
+
+      // 最初の画像から表示したいのでインデックスを0にリセット
+      currentImageIndex = 0;
+
+      // 1枚以上画像がアップロードされていたら
+      if (uploadedFiles.length > 0) {
+        displayImage();  // 画像を表示する
+      }
+
+      clearInputCode();
+    }
+
+    /*--------------------------------------
+      画像を画面に表示する処理
+    --------------------------------------*/
+
+    function displayImage() {
+
+      // 現在表示すべき画像を取得
+      const file = uploadedFiles[currentImageIndex];
+
+      // imgタグを作る
+      const imgElement = document.createElement("img");
+      imgElement.src = URL.createObjectURL(file);
+      imgElement.alt = file.name;
+
+      // 画像表示エリア(#imagePreview)を取得し、その中身を空にして古い画像を消去
+      document.getElementById("imagePreview").innerHTML = "";
+
+      // <div id="imagePreview"></div>の中に<img>を追加
+      document.getElementById("imagePreview").appendChild(imgElement);
+    }
+
+    /*--------------------------------------
+      次の画像に進む処理
+   --------------------------------------*/
+
+    function nextImage() {
+      // インデックスを1つ増やす
+      currentImageIndex++;
+
+      // 次の画像があるかチェック。
+      if (currentImageIndex < uploadedFiles.length) {
+        displayImage(); // 画像を表示
+      } else {
+        alert("すべての画像が処理されました。");
+      }
+
+      displayCounter();       // カウンターの表示を更新
+      namePreview();          // ファイル名プレビューも更新
+    }
+
+    /*--------------------------------------
+   前の画像に戻る処理
+--------------------------------------*/
+
+    function prevImage() {
+
+      currentImageIndex--;
+      displayImage();
+
+      displayCounter();       // カウンターの表示を更新
+      namePreview();          // ファイル名プレビューも更新
     }
 
     /*--------------------------------------
@@ -184,27 +259,8 @@
 
       clearSuffixInput();
       clearInputCode();  //入力欄のクリア
-      moveToNextImage();  // 次の画像へ
+      nextImage();  // 次の画像へ
 
-    }
-
-    /*--------------------------------------
-   次の画像に進む処理
---------------------------------------*/
-
-    function moveToNextImage() {
-      // インデックスを1つ増やす
-      currentImageIndex++;
-
-      // 次の画像があるかチェック。
-      if (currentImageIndex < uploadedFiles.length) {
-        displayImage(); // 画像を表示
-      } else {
-        alert("すべての画像が処理されました。");
-      }
-
-      displayCounter();       // カウンターの表示を更新
-      namePreview();          // ファイル名プレビューも更新
     }
 
     /*--------------------------------------
@@ -225,47 +281,6 @@
       navigator.clipboard.writeText(filename)
 
     }
-    /*--------------------------------------
-   画像がアップロードされた時の処理
---------------------------------------*/
-
-    function onImageUpload(event) {
-
-      // 全画像を配列化する
-      uploadedFiles = Array.from(event.target.files);
-
-      // 最初の画像から表示したいのでインデックスを0にリセット
-      currentImageIndex = 0;
-
-      // 1枚以上画像がアップロードされていたら
-      if (uploadedFiles.length > 0) {
-        displayImage();  // 画像を表示する
-      }
-
-      clearInputCode();
-    }
-
-    /*--------------------------------------
-    画像を画面に表示する処理
---------------------------------------*/
-
-    function displayImage() {
-
-      // 現在表示すべき画像を取得
-      const file = uploadedFiles[currentImageIndex];
-
-      // imgタグを作る
-      const imgElement = document.createElement("img");
-      imgElement.src = URL.createObjectURL(file);
-      imgElement.alt = file.name;
-
-      // 画像表示エリア(#imagePreview)を取得し、その中身を空にして古い画像を消去
-      document.getElementById("imagePreview").innerHTML = "";
-
-      // <div id="imagePreview"></div>の中に<img>を追加
-      document.getElementById("imagePreview").appendChild(imgElement);
-    }
-
 
     /*--------------------------------------
     入力欄のクリア処理＋入力欄にフォーカス
@@ -291,6 +306,35 @@
     }
 
     /*--------------------------------------
+    カウンターを減らす関数
+--------------------------------------*/
+    function decrementCounter() {
+      const category = document.getElementById("category").value;
+
+      // 現在のカウンターが1より大きい時に-1する
+      if (counters[category] > 1) {
+        counters[category]--;
+        saveCounter(category);
+        displayCounter(); //表示更新
+        namePreview(); //プレビュー更新
+      } else {
+        alert("これ以上戻れません");
+      }
+    }
+    /*--------------------------------------
+    カウンターを進める関数
+--------------------------------------*/
+    function incrementCounter() {
+      const category = document.getElementById("category").value;
+
+      counters[category]++;
+      saveCounter(category);
+      displayCounter(); //表示更新
+      namePreview(); //プレビュー更新
+
+    }
+
+    /*--------------------------------------
     ページ読み込み時に初期状態にする
 --------------------------------------*/
     displayCounter();        // カウンターの表示を更新
@@ -300,46 +344,16 @@
     エンターキーで画像ダウンロードを実行
 --------------------------------------*/
 
-document.addEventListener("keydown",function(){
-  if(event.key === "Enter")
-  downloadFile();
-})
-
-    /*--------------------------------------
-    カウンターを減らす関数
---------------------------------------*/
-function decrementCounter(){
-const category=document.getElementById("category").value;
-
-// 現在のカウンターが1より大きい時に-1する
-if(counters[category]>1){
-  counters[category]--;
-  saveCounter(category);
-  displayCounter(); //表示更新
-  namePreview(); //プレビュー更新
-}else{
-  alert("これ以上戻れません");
-}
-}
-    /*--------------------------------------
-    カウンターを進める関数
---------------------------------------*/
-function incrementCounter(){
-const category=document.getElementById("category").value;
-
-  counters[category]++;
-  saveCounter(category);
-  displayCounter(); //表示更新
-  namePreview(); //プレビュー更新
-
-}
+    document.addEventListener("keydown", function () {
+      if (event.key === "Enter")
+        downloadFile();
+    })
 
 
-// todo 生成しない画像スキップ、ダウンロードキャンセルした時はカウンタ進めない。サフィックスを毎回クリア。
+    // todo 生成しない画像スキップ、ダウンロードキャンセルした時はカウンタ進めない。サフィックスを毎回クリア。
 
   </script>
 
 </body>
 
 </html>
-
