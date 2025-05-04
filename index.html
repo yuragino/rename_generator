@@ -28,7 +28,7 @@
     <!-- ファイル名コピーボタン -->
     <button class="button" onclick="copyFilename()">ファイル名コピー</button>
   </div>
-  
+
   <!-- 身丈＋裄＋後幅をまとめて入力（例：1506528） -->
   <label for="inputCode">身丈+裄+後幅（例：1506528）</label>
   <button type="button" onclick="clearInputCode()">クリア</button>
@@ -167,7 +167,7 @@
 
       // カウンターを更新
       if (numberInput) {
-        counters[category] = Number(numberInput)+ 1;
+        counters[category] = Number(numberInput) + 1;
       } else {
         counters[category]++;
       }
@@ -215,7 +215,7 @@
       if (inputCode.length !== 7) {
         alert("入力は7桁である必要があります（例：1506528）");
         // 処理を中断
-        return "";
+        return;
       }
 
       // クリップボードにコピー
@@ -239,7 +239,7 @@
         displayImage();  // 画像を表示する
       }
 
-      clearInputCode(); 
+      clearInputCode();
     }
 
     /*--------------------------------------
@@ -293,6 +293,15 @@
 --------------------------------------*/
     displayCounter();        // カウンターの表示を更新
     namePreview();           // ファイル名プレビューも更新
+
+    /*--------------------------------------
+    エンターキーで画像ダウンロードを実行
+--------------------------------------*/
+
+document.addEventListener("keydown",function(){
+  if(event.key === "Enter")
+  downloadFile();
+})
 
   </script>
 
