@@ -23,26 +23,26 @@
 
   <div class="downloadCopy">
     <!-- ダウンロードボタン -->
-    <button class="button" onclick="downloadFile()">画像ダウンロード</button>
+    <button class="button" onclick="processFilename('download')">画像ダウンロード</button>
 
     <!-- ファイル名コピーボタン -->
-    <button class="button" onclick="copyFilename()">ファイル名コピー</button>
+    <button class="button" onclick="processFilename('copy')">ファイル名コピー</button>
   </div>
 
   <!-- 身丈＋裄＋後幅をまとめて入力（例：1506528） -->
-  <button type="button" onclick="clearInputCode()">クリア</button>
+  <button type="button" onclick="clearInput('inputCode')">クリア</button>
   <label for="inputCode">身丈+裄+後幅（例：1506528）</label>
   <input type="text" id="inputCode" maxlength="7" oninput="namePreview()" autocomplete="off" />
 
   <!-- 通し番号の手動入力（または自動） -->
-  <button type="button" onclick="clearNumberInput()">クリア</button>
+  <button type="button" onclick="clearInput('numberInput')">クリア</button>
   <label for="numberInput">通し番号（現在値: <span id="counterDisplay">001</span>）</label>
   <button type="button" onclick="decrementCounter()">戻る</button>
   <button type="button" onclick="incrementCounter()">進む</button>
   <input type="number" id="numberInput" placeholder="変更しないなら空欄でOK" oninput="namePreview()" autocomplete="off" />
 
   <!-- 任意の英字など追加 -->
-  <button type="button" onclick="clearSuffixInput()">クリア</button>
+  <button type="button" onclick="clearInput('SuffixInput')">クリア</button>
   <label for="suffixInput">任意の文字（例：a, b など）</label>
   <input type="text" id="suffixInput" maxlength="1" placeholder="空欄OK" oninput="namePreview()" autocomplete="off" />
 
@@ -171,7 +171,7 @@
         displayImage();  // 画像を表示する
       }
 
-      clearInputCode();
+      clearInput("inputCode");
     }
 
     /*--------------------------------------
@@ -196,7 +196,7 @@
     }
 
     /*--------------------------------------
-      次の画像に進む処理
+      次の画像に進む関数
    --------------------------------------*/
 
     function nextImage() {
@@ -215,7 +215,7 @@
     }
 
     /*--------------------------------------
-   前の画像に戻る処理
+    前の画像に戻る関数
 --------------------------------------*/
 
     function prevImage() {
@@ -228,11 +228,9 @@
     }
 
     /*--------------------------------------
-   ダウンロードボタンがクリックされた時の処理
+   ダウンロードボタン、コピーボタンの処理
 --------------------------------------*/
-
-    function downloadFile() {
-
+    function processFilename(action) {
       // 戻り値を受け取る
       const { filename, category, inputCode, numberInput } = generateFilename();
 
@@ -242,67 +240,41 @@
         return "";
       }
 
-      // カウンターを更新
-      if (numberInput) {
-        counters[category] = Number(numberInput) + 1;
-      } else {
-        counters[category]++;
+      if (action == "download") {
+
+        // カウンターを更新
+        if (numberInput) {
+          counters[category] = Number(numberInput) + 1;
+        } else {
+          counters[category]++;
+        }
+        saveCounter(category);
+
+        //画像のダウンロード処理
+        const currentFile = uploadedFiles[currentImageIndex];
+        const link = document.createElement('a');      // aタグを作る
+        link.href = URL.createObjectURL(currentFile);
+        link.download = filename;
+        link.click();      // リンクを自動クリック
+
+        clearInput("suffixInput");
+        clearInput("numberInput");
+
+        nextImage();  // 次の画像へ
+
+      } else if(action == "copy"){
+        // クリップボードにコピー
+        navigator.clipboard.writeText(filename)
       }
-      saveCounter(category);
-
-      //画像のダウンロード処理
-      const currentFile = uploadedFiles[currentImageIndex];
-      const link = document.createElement('a');      // aタグを作る
-      link.href = URL.createObjectURL(currentFile);
-      link.download = filename;
-      link.click();      // リンクを自動クリック
-
-      clearSuffixInput();
-      clearInputCode();  //入力欄のクリア
-      nextImage();  // 次の画像へ
-
-    }
-
-    /*--------------------------------------
-    コピーボタンがクリックされた時の処理
---------------------------------------*/
-    function copyFilename() {
-
-      // 戻り値を受け取る
-      const { filename, category, inputCode, numberInput } = generateFilename();
-
-      if (inputCode.length !== 7) {
-        alert("入力は7桁である必要があります（例：1506528）");
-        // 処理を中断
-        return;
-      }
-
-      // クリップボードにコピー
-      navigator.clipboard.writeText(filename)
-
     }
 
     /*--------------------------------------
     入力欄のクリア処理＋入力欄にフォーカス
 --------------------------------------*/
-    // 身丈+裄+後幅のクリア
-    function clearInputCode() {
-      document.getElementById("inputCode").value = '';
+    function clearInput(id) {
+      document.getElementById(id).value = '';
       namePreview();
-      document.getElementById("inputCode").focus();
-    }
-
-    // 手入力通し番号のクリア
-    function clearNumberInput() {
-      document.getElementById("numberInput").value = '';
-      namePreview();
-      document.getElementById("numberInput").focus();
-    }
-
-    // 任意の文字のクリア
-    function clearSuffixInput() {
-      document.getElementById("suffixInput").value = '';
-      namePreview();
+      document.getElementById(id).focus();
     }
 
     /*--------------------------------------
@@ -321,6 +293,7 @@
         alert("これ以上戻れません");
       }
     }
+
     /*--------------------------------------
     カウンターを進める関数
 --------------------------------------*/
@@ -337,20 +310,20 @@
     /*--------------------------------------
     ページ読み込み時に初期状態にする
 --------------------------------------*/
-    displayCounter();        // カウンターの表示を更新
-    namePreview();           // ファイル名プレビューも更新
+
+    window.addEventListener("DOMContentLoaded", () => {
+      displayCounter();        // カウンターの表示を更新
+      namePreview();           // ファイル名プレビューも更新
+    })
 
     /*--------------------------------------
     エンターキーで画像ダウンロードを実行
 --------------------------------------*/
 
-    document.addEventListener("keydown", function () {
+    document.addEventListener("keydown", function (event) {
       if (event.key === "Enter")
         downloadFile();
     })
-
-
-    // todo 生成しない画像スキップ、ダウンロードキャンセルした時はカウンタ進めない。サフィックスを毎回クリア。
 
   </script>
 
