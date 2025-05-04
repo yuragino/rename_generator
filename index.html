@@ -39,9 +39,9 @@
   <!-- カテゴリ選択：浴衣・単衣・小紋・銘仙 -->
   <label for="category">カテゴリを選択：</label>
   <!-- カテゴリ変更時に、2つの関数を実行 -->
-  <!-- updateNumberDisplay()：通し番号を表示する -->
-  <!-- updatePreview()：プレビューのファイル名を更新する -->
-  <select id="category" onchange="updateNumberDisplay(); updatePreview();">
+  <!-- displayCounter()：通し番号を表示する -->
+  <!-- namePreview()：プレビューのファイル名を更新する -->
+  <select id="category" onchange="displayCounter(); namePreview();">
     <option value="yukata">浴衣</option>
     <option value="hitoe">単衣</option>
     <option value="komon">小紋</option>
@@ -51,17 +51,17 @@
   <!-- 身丈＋裄＋後幅をまとめて入力（例：1506528） -->
   <label for="inputCode">身丈+裄+後幅（例：1506528）</label>
   <button type="button" onclick="clearInputCode()">クリア</button>
-  <input type="text" id="inputCode" maxlength="7" oninput="updatePreview()" />
+  <input type="text" id="inputCode" maxlength="7" oninput="namePreview()" />
 
   <!-- 通し番号の手動入力（または自動） -->
   <label for="numberInput">通し番号（現在値: <span id="counterDisplay">001</span>）</label>
   <button type="button" onclick="clearNumberInput()">クリア</button>
-  <input type="number" id="numberInput" placeholder="変更しないなら空欄でOK" oninput="updatePreview()" />
+  <input type="number" id="numberInput" placeholder="変更しないなら空欄でOK" oninput="namePreview()" />
 
   <!-- 任意の英字など追加 -->
   <label for="suffixInput">任意の文字（例：a, b など）</label>
   <button type="button" onclick="clearSuffixInput()">クリア</button>
-  <input type="text" id="suffixInput" maxlength="1" placeholder="空欄OK" oninput="updatePreview()" />
+  <input type="text" id="suffixInput" maxlength="1" placeholder="空欄OK" oninput="namePreview()" />
 
   <!-- 生成されるファイル名のプレビュー表示 -->
   <div id="preview">生成予定ファイル名：</div>
@@ -90,8 +90,8 @@
       カウンター作成
     --------------------------------------*/
     const counters = {
-      // localStorageから〇〇Counterという名前のデータ(文字列)をとってくる。 Number()で文字を数字に変える
-      // 値 ? A : B 「もし値があれば A、なければ B」
+
+      // ローカルストレージにカウンターがなければcounters[category]に1を設定。
       yukata: localStorage.getItem('yukataCounter') ? Number(localStorage.getItem('yukataCounter')) : 1,
       hitoe: localStorage.getItem('hitoeCounter') ? Number(localStorage.getItem('hitoeCounter')) : 1,
       komon: localStorage.getItem('komonCounter') ? Number(localStorage.getItem('komonCounter')) : 1,
@@ -102,42 +102,42 @@
   持ってきた数字を3桁に0埋めする関数
 --------------------------------------*/
     // 0埋めしたい数字が引数
-    function pad(num) {
-      // padStart (目標となる文字列の長さ,先頭に埋める文字)
-      return num.toString().padStart(3, '0')
+    function zeroPad(num) {
+      // PadStart (目標となる文字列の長さ,先頭に埋める文字)
+      return num.toString().PadStart(3, '0')
     }
 
     /*--------------------------------------
   現在値に通し番号を表示
 --------------------------------------*/
-    function updateNumberDisplay() {
-      // category = idがcategoryの場所でユーザーが選んだ値
+    function displayCounter() {
+      // カテゴリの種類を取得
       const category = document.getElementById("category").value;
-      // idがcounterDisplayの場所(現在値)に表示する番号を0埋めでつくる
-      document.getElementById("counterDisplay").textContent = pad(counters[category]);
+      // 「現在値:」に続けて表示する
+      document.getElementById("counterDisplay").textContent = zeroPad(counters[category]);
     }
 
     /*--------------------------------------
   通し番号をlocalStorageに保存
 --------------------------------------*/
     function saveCounter(category) {
-      // 動的にプロパティを参照したいのでcounters[category]
       // 例("yukataCounter", 6)
       localStorage.setItem(`${category}Counter`, counters[category]);
     }
 
     /*--------------------------------------
-  入力欄から値を取得、ファイル名のプレビューを生成する
+ファイル名を作成
 --------------------------------------*/
-    function updatePreview() {
 
-      // 以下のidを持つ要素（選択肢,テキスト入力）から値を取得。文字列の場合は、trim()で値の前後の空白を取り除く
+    function namePreview() {
+
+      // 入力内容を取得
       const category = document.getElementById("category").value;
       const inputCode = document.getElementById("inputCode").value.trim();
       const numberInput = document.getElementById("numberInput").value;
       const suffix = document.getElementById("suffixInput").value.trim();
 
-      // preview変数の最初に「生成予定ファイル名：」を代入
+      // 表示する文字列を作成していく。先頭↓
       let preview = "生成予定ファイル名：";
 
       // 入力チェックがOKのとき
@@ -148,15 +148,15 @@
         const 裄 = inputCode.slice(3, 5);
         const 後幅 = inputCode.slice(5, 7);
 
-        // 通し番号が手動で入力されている場合、値を数字に変換し、3桁の0埋め
-        //入力されてない場合、カウンターを使用しnumberに代入
-        let number = numberInput ? pad(Number(numberInput)) : pad(counters[category]);
+        // ファイル名に使う通し番号を作成。手入力優先。
+        let number = numberInput ? zeroPad(Number(numberInput)) : zeroPad(counters[category]);
 
         preview += ` ${category}${number}${suffix}_身丈${身丈}_裄${裄}_後幅${後幅}`;
       }
-      // 生成予定ファイル名の部分をpreview変数の値に置き換える
+      // 「生成予定ファイル名：」にプレビューを表示
       document.getElementById("preview").textContent = preview;
     }
+
 
     /*--------------------------------------
   ファイル名生成＆ダウンロード処理
@@ -164,13 +164,12 @@
 
     function generateFilename() {
 
-      // 以下のidを持つ要素（選択肢,テキスト入力）から値を取得。文字列の場合は、trim()で値の前後の空白を取り除く
+      // 入力内容を取得
       const category = document.getElementById("category").value;
       const inputCode = document.getElementById("inputCode").value.trim();
       const numberInput = document.getElementById("numberInput");
       const suffix = document.getElementById("suffixInput").value.trim();
 
-      // 入力チェック
       if (!/^\d{7}$/.test(inputCode)) {
         alert("7桁の数字（身丈3桁＋裄2桁＋後幅2桁）を入力してください。");
         return;
@@ -188,14 +187,14 @@
         // 入力欄の値を数字に変換
         const inputNumber = Number(numberInput.value);
         // 3桁になるように0埋め
-        number = pad(inputNumber);
+        number = zeroPad(inputNumber);
         // カウンターを更新
         counters[category] = inputNumber + 1;
         // カウンターをlocalStorageに保存
         saveCounter(category);
       } else {
         // 現在のカウンターの数をそのまま使用し、0埋め
-        number = pad(counters[category]);
+        number = zeroPad(counters[category]);
         // カウンターを更新
         counters[category]++;
         // カウンンターを保存
@@ -226,22 +225,22 @@
 
       // 次の画像があるかチェック。
       if (currentImageIndex < uploadedFiles.length) {
-        // 次の画像を表示
-        displayNextImage();
+        // 画像を表示
+        displayImage();
       } else {
         alert("すべての画像が処理されました。");
       }
 
-      // 画面ん異表示されている現在値を更新
-      updateNumberDisplay();
+      // 画面に表示されている現在値を更新
+      displayCounter();
       // プレビュー欄を最新の状態に更新
-      updatePreview();
+      namePreview();
     }
 
     /*--------------------------------------
-画像アップロード後に最初の画像を表示
+画像がアップロードされた時の処理
 --------------------------------------*/
-    // event:イベントオブジェクト(ユーザーが何か操作した情報が入ってる)
+
     // ↓「inputタグで画像ファイルを選んだ」という操作が入ってる
     function handleImageUpload(event) {
 
@@ -250,21 +249,21 @@
       // Array.from()で本物の配列にする。
       uploadedFiles = Array.from(event.target.files);
 
-      // 最初の画像から表示したいので0にリセット
+      // 最初の画像から表示したいので0インデックスをにリセット
       currentImageIndex = 0;
 
       // 1枚以上画像がアップロードされていたら
       if (uploadedFiles.length > 0) {
         // 画像を表示する
-        displayNextImage();
+        displayImage();
       }
     }
 
     /*--------------------------------------
-  次の画像を画面に表示
+  画像を画面に表示
 --------------------------------------*/
 
-    function displayNextImage() {
+    function displayImage() {
 
       // アップロードされたファイルの中から現在表示すべき画像を取得
       const file = uploadedFiles[currentImageIndex];
@@ -293,7 +292,7 @@
     // 身丈+裄+後幅のクリア
     function clearInputCode() {
       document.getElementById("inputCode").value = '';
-      updatePreview();
+      namePreview();
       // 入力欄にカーソルを置く
       document.getElementById("inputCode").focus();
     }
@@ -301,14 +300,14 @@
     // 手入力通し番号のクリア
     function clearNumberInput() {
       document.getElementById("numberInput").value = '';
-      updatePreview();
+      namePreview();
       document.getElementById("numberInput").focus();
     }
 
     // 任意の文字のクリア
     function clearSuffixInput() {
       document.getElementById("suffixInput").value = '';
-      updatePreview();
+      namePreview();
       document.getElementById("suffixInput").focus();
     }
 
@@ -316,9 +315,9 @@
   ページ読み込み時に初期状態にする
 --------------------------------------*/
     // カウンターの数字を表示
-    updateNumberDisplay();
+    displayCounter();
     // ファイル名のプレビューを最新の状態にする
-    updatePreview();
+    namePreview();
 
   </script>
 
