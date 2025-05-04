@@ -30,18 +30,20 @@
   </div>
 
   <!-- 身丈＋裄＋後幅をまとめて入力（例：1506528） -->
-  <label for="inputCode">身丈+裄+後幅（例：1506528）</label>
   <button type="button" onclick="clearInputCode()">クリア</button>
+  <label for="inputCode">身丈+裄+後幅（例：1506528）</label>
   <input type="text" id="inputCode" maxlength="7" oninput="namePreview()" autocomplete="off" />
 
   <!-- 通し番号の手動入力（または自動） -->
-  <label for="numberInput">通し番号（現在値: <span id="counterDisplay">001</span>）</label>
   <button type="button" onclick="clearNumberInput()">クリア</button>
+  <label for="numberInput">通し番号（現在値: <span id="counterDisplay">001</span>）</label>
+  <button type="button" onclick="decrementCounter()">戻る</button>
+  <button type="button" onclick="incrementCounter()">進む</button>
   <input type="number" id="numberInput" placeholder="変更しないなら空欄でOK" oninput="namePreview()" autocomplete="off" />
 
   <!-- 任意の英字など追加 -->
-  <label for="suffixInput">任意の文字（例：a, b など）</label>
   <button type="button" onclick="clearSuffixInput()">クリア</button>
+  <label for="suffixInput">任意の文字（例：a, b など）</label>
   <input type="text" id="suffixInput" maxlength="1" placeholder="空欄OK" oninput="namePreview()" autocomplete="off" />
 
   <!-- 生成されるファイル名のプレビュー表示 -->
@@ -180,7 +182,8 @@
       link.download = filename;
       link.click();      // リンクを自動クリック
 
-      clearInputCode();  //入力欄のクリアとフォーカス
+      clearSuffixInput();
+      clearInputCode();  //入力欄のクリア
       moveToNextImage();  // 次の画像へ
 
     }
@@ -285,7 +288,6 @@
     function clearSuffixInput() {
       document.getElementById("suffixInput").value = '';
       namePreview();
-      document.getElementById("suffixInput").focus();
     }
 
     /*--------------------------------------
@@ -303,8 +305,41 @@ document.addEventListener("keydown",function(){
   downloadFile();
 })
 
+    /*--------------------------------------
+    カウンターを減らす関数
+--------------------------------------*/
+function decrementCounter(){
+const category=document.getElementById("category").value;
+
+// 現在のカウンターが1より大きい時に-1する
+if(counters[category]>1){
+  counters[category]--;
+  saveCounter(category);
+  displayCounter(); //表示更新
+  namePreview(); //プレビュー更新
+}else{
+  alert("これ以上戻れません");
+}
+}
+    /*--------------------------------------
+    カウンターを進める関数
+--------------------------------------*/
+function incrementCounter(){
+const category=document.getElementById("category").value;
+
+  counters[category]++;
+  saveCounter(category);
+  displayCounter(); //表示更新
+  namePreview(); //プレビュー更新
+
+}
+
+
+// todo 生成しない画像スキップ、ダウンロードキャンセルした時はカウンタ進めない。サフィックスを毎回クリア。
+
   </script>
 
 </body>
 
 </html>
+
