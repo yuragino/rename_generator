@@ -128,8 +128,16 @@
       // 手入力優先
       number = numberInput ? zeroPad(Number(numberInput)) : zeroPad(counters[category]);
 
+      // カテゴリ名を日本語に変換
+      const categoryNames = {
+        yukata: "浴衣",
+        hitoe: "単衣",
+        komon: "小紋",
+        meisen: "銘仙"
+      };
+
       // 完全なファイル名作成
-      let filename = `${category}${number}${suffix}_身丈${身丈}_裄${裄}_後幅${後幅}`;
+      let filename = `${categoryNames[category]}${number}${suffix}_身丈${身丈}_裄${裄}_後幅${後幅}`;
 
       return {
         filename,
@@ -262,7 +270,7 @@
 
         nextImage();  // 次の画像へ
 
-      } else if(action == "copy"){
+      } else if (action == "copy") {
         // クリップボードにコピー
         navigator.clipboard.writeText(filename)
       }
