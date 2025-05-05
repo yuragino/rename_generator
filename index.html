@@ -37,8 +37,8 @@
   <!-- 通し番号の手動入力（または自動） -->
   <button type="button" onclick="clearInput('numberInput')">クリア</button>
   <label for="numberInput">通し番号（現在値: <span id="counterDisplay">001</span>）</label>
-  <button type="button" onclick="decrementCounter()">戻る</button>
-  <button type="button" onclick="incrementCounter()">進む</button>
+  <button type="button" onclick="updateCounter(down)">戻る</button>
+  <button type="button" onclick="updateCounter(up)">進む</button>
   <input type="number" id="numberInput" placeholder="変更しないなら空欄でOK" oninput="namePreview()" autocomplete="off" />
 
   <!-- 任意の英字など追加 -->
@@ -287,35 +287,29 @@
     }
 
     /*--------------------------------------
-    カウンターを減らす関数
+    カウンターを更新する関数（+1 か -1）
 --------------------------------------*/
-    function decrementCounter() {
+
+    function updateCounter(direction) {
+
       const category = document.getElementById("category").value;
 
-      // 現在のカウンターが1より大きい時に-1する
-      if (counters[category] > 1) {
-        counters[category]--;
-        saveCounter(category);
-        displayCounter(); //表示更新
-        namePreview(); //プレビュー更新
+      if (direction = "up") { //進むボタン
+        counters[category]++;
+      } else if (direction = "down") { //戻るボタン
+        if (counters[category] > 1) {
+          counters[category]--;
+        }
       } else {
         alert("これ以上戻れません");
       }
-    }
 
-    /*--------------------------------------
-    カウンターを進める関数
---------------------------------------*/
-    function incrementCounter() {
-      const category = document.getElementById("category").value;
-
-      counters[category]++;
       saveCounter(category);
       displayCounter(); //表示更新
       namePreview(); //プレビュー更新
 
     }
-
+    
     /*--------------------------------------
     ページ読み込み時に初期状態にする
 --------------------------------------*/
@@ -331,7 +325,7 @@
 
     document.addEventListener("keydown", function (event) {
       if (event.key === "Enter")
-      processFilename('download');
+        processFilename('download');
     })
 
   </script>
