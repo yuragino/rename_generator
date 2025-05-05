@@ -37,8 +37,8 @@
   <!-- 通し番号の手動入力（または自動） -->
   <button type="button" onclick="clearInput('numberInput')">クリア</button>
   <label for="numberInput">通し番号（現在値: <span id="counterDisplay">001</span>）</label>
-  <button type="button" onclick="updateCounter(down)">戻る</button>
-  <button type="button" onclick="updateCounter(up)">進む</button>
+  <button type="button" onclick="updateCounter('down')">戻る</button>
+  <button type="button" onclick="updateCounter('up')">進む</button>
   <input type="number" id="numberInput" placeholder="変更しないなら空欄でOK" oninput="namePreview()" autocomplete="off" />
 
   <!-- 任意の英字など追加 -->
@@ -304,12 +304,13 @@
         alert("これ以上戻れません");
       }
 
+      document.getElementById("inputCode").focus();
       saveCounter(category);
       displayCounter(); //表示更新
       namePreview(); //プレビュー更新
 
     }
-    
+
     /*--------------------------------------
     ページ読み込み時に初期状態にする
 --------------------------------------*/
