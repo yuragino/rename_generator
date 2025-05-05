@@ -14,7 +14,7 @@
   <!-- カテゴリ選択：浴衣・単衣・小紋・銘仙 -->
   <label for="category">カテゴリを選択：</label>
   <!-- カテゴリ変更時に、2つの関数を実行 -->
-  <select id="category" onchange="displayCounter(); namePreview();">
+  <select id="category" onchange="saveCategory(); displayCounter(); namePreview();">
     <option value="yukata">浴衣</option>
     <option value="hitoe">単衣</option>
     <option value="komon">小紋</option>
@@ -99,11 +99,20 @@
     }
 
     /*--------------------------------------
-    通し番号をlocalStorageに保存
+      カウンターをlocalStorageに保存
 --------------------------------------*/
     function saveCounter(category) {
       // 例("yukataCounter", 6)
       localStorage.setItem(`${category}Counter`, counters[category]);
+    }
+
+    /*--------------------------------------
+      カテゴリをlocalStorageに保存
+--------------------------------------*/
+    function saveCategory() {
+      const category = document.getElementById("category").value;
+      // categoryの値をselectedCategory という名前で localStorage に保存する
+      localStorage.setItem("lastCategory", category);
     }
 
     /*--------------------------------------
@@ -316,6 +325,12 @@
 --------------------------------------*/
 
     window.addEventListener("DOMContentLoaded", () => {
+      // カテゴリ名復元
+      const savedCategory = localStorage.getItem("lastCategory");
+      if(saveCategory){
+        document.getElementById("category").value = savedCategory;
+      }
+
       displayCounter();        // カウンターの表示を更新
       namePreview();           // ファイル名プレビューも更新
     })
